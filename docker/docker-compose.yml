@@ -1,0 +1,73 @@
+version: "3.9"
+
+# Local development stack — mirrors the AWS services used in production.
+# Starts LocalStack (AWS emulator) + a Redshift-compatible Postgres instance.
+#
+# Usage:
+#   docker compose up -d          # start all services
+#   docker compose logs -f        # tail logs
+#   docker compose down -v        # stop and remove volumes
+
+services:
+
+  # ── LocalStack — emulates Kinesis, Lambda, Firehose, S3, DynamoDB, SQS ────
+  localstack:
+    image: localstack/localstack:3.4
+    container_name: kinesis-localstack
+    ports:
+      - "4566:4566"       # unified endpoint for all AWS services
+    environment:
+      - SERVICES=kinesis,lambda,firehose,s3,dynamodb,sqs,cloudwatch,iam
+      - DEBUG=0
+      - LAMBDA_EXECUTOR=local
+      - AWS_DEFAULT_REGION=us-east-1
+      - PERSISTENCE=1     # persist state across restarts
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./scripts/localstack_init.sh:/etc/localstack/init/ready.d/init.sh:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ── Postgres — Redshift-compatible for local SQL development ───────────────
+  redshift-local:
+    image: postgres:15-alpine
+    container_name: kinesis-redshift-local
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: analytics
+      POSTGRES_USER: pipeline_user
+      POSTGRES_PASSWORD: localpassword
+    volumes:
+      - redshift_data:/var/lib/postgresql/data
+      - ./redshift/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pipeline_user -d analytics"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ── Pipeline init — seeds LocalStack with all required AWS resources ───────
+  pipeline-init:
+    image: amazon/aws-cli:2.15.0
+    container_name: kinesis-init
+    depends_on:
+      localstack:
+        condition: service_healthy
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ENDPOINT_URL=http://localstack:4566
+    volumes:
+      - ./scripts/seed_localstack.sh:/seed.sh:ro
+    command: ["/bin/bash", "/seed.sh"]
+    restart: "no"
+
+volumes:
+  localstack_data:
+  redshift_data:
