@@ -98,14 +98,7 @@ def render_dashboard(
 ) -> None:
     """Print dashboard to terminal."""
     print(CLEAR, end="")
-    total_rps = sum(m.get("IncomingRecords", 0) / interval for m in shard_metrics.values())
-    total_throttles = sum(m.get("WriteProvisionedThroughputExceeded", 0) for m in shard_metrics.values())
 
-    print(f"{BOLD}{CYAN}Kinesis Shard Monitor{RESET}  stream={BOLD}{stream_name}{RESET}")
-    print(f"Refreshed: {datetime.now().strftime('%H:%M:%S')}  "
-          f"Shards: {len(shards)}  "
-          f"Total: {BOLD}{total_rps:,.0f} rec/s{RESET}  "
-          f"Throttles: {RED if total_throttles > 0 else GREEN}{total_throttles:.0f}{RESET}")
     print("─" * 80)
     print(f"{'Shard':<20} {'Records/s':>10}  {'Utilisation (1 MB/s cap)':30}  {'Throttles':>10}")
     print("─" * 80)

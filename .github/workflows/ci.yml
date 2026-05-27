@@ -33,13 +33,13 @@ jobs:
         run: pip install flake8 black isort
 
       - name: flake8
-        run: flake8 producer/ lambda/ redshift/ tests/ --max-line-length=100
+        run: flake8 producer/ lambda_fn/ redshift/ scripts/ tests/ --max-line-length=100
 
       - name: black (check only)
-        run: black --check --line-length=100 producer/ lambda/ redshift/ tests/
+        run: black --check --line-length=100 producer/ lambda_fn/ redshift/ scripts/ tests/
 
       - name: isort (check only)
-        run: isort --check-only producer/ lambda/ redshift/ tests/
+        run: isort --check-only producer/ lambda_fn/ redshift/ scripts/ tests/
 
   # ── Unit Tests ───────────────────────────────────────────────────────────────
   test:
@@ -122,12 +122,12 @@ jobs:
 
       - name: Install Lambda dependencies
         run: |
-          pip install -r requirements.txt --target lambda/package
+          pip install -r requirements.txt --target lambda_fn/package
 
       - name: Zip Lambda
         run: |
           cd lambda_fn/package && zip -r ../../lambda.zip . -x "*.pyc" -x "__pycache__/*"
-          cd ../../lambda && zip -g ../lambda.zip handler.py idempotency.py
+          cd ../../lambda_fn && zip -g ../lambda.zip handler.py idempotency.py
           echo "Lambda zip size: $(du -sh ../lambda.zip | cut -f1)"
 
       - name: Upload Lambda artifact

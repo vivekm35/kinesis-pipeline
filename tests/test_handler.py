@@ -8,7 +8,7 @@ import base64
 import json
 import os
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import boto3
 import pytest

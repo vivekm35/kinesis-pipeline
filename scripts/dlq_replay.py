@@ -124,7 +124,7 @@ def replay_to_kinesis(
     total_failed = 0
 
     for i in range(0, len(payloads), BATCH_SIZE):
-        chunk = payloads[i : i + BATCH_SIZE]
+        chunk = payloads[i:i + BATCH_SIZE]
         records = [
             {
                 "Data": json.dumps(p).encode("utf-8") if isinstance(p, dict) else p,
@@ -158,7 +158,7 @@ def replay_to_kinesis(
 def delete_replayed_messages(sqs: Any, dlq_url: str, messages: list[dict]) -> None:
     """Delete successfully replayed messages from DLQ in batches of 10."""
     for i in range(0, len(messages), 10):
-        batch = messages[i : i + 10]
+        batch = messages[i:i + 10]
         entries = [
             {"Id": str(j), "ReceiptHandle": m["ReceiptHandle"]}
             for j, m in enumerate(batch)

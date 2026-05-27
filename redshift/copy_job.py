@@ -24,11 +24,8 @@ import argparse
 import logging
 import os
 import time
-from typing import Optional
 
-import boto3
 import psycopg2
-from botocore.exceptions import ClientError
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)

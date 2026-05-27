@@ -38,7 +38,8 @@ os.environ["AWS_SECRET_ACCESS_KEY"] = "test"
 os.environ["AWS_DEFAULT_REGION"] = REGION
 os.environ["FIREHOSE_DELIVERY_STREAM"] = FIREHOSE
 os.environ["IDEMPOTENCY_TABLE"] = DDB_TABLE
-os.environ["DLQ_URL"] = f"http://sqs.{REGION}.localhost.localstack.cloud:4566/000000000000/kinesis-pipeline-dev-events-dlq"
+_b = f"http://sqs.{REGION}.localhost.localstack.cloud:4566"
+os.environ["DLQ_URL"] = f"{_b}/000000000000/kinesis-pipeline-dev-events-dlq"
 
 
 def client(service: str):

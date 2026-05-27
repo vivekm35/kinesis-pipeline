@@ -12,7 +12,6 @@ TTL is set to 24 hours so the table self-cleans without manual pruning.
 
 import logging
 import time
-from typing import Optional
 
 import boto3
 from botocore.exceptions import ClientError

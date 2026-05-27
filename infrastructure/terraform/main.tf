@@ -68,7 +68,7 @@ resource "aws_kinesis_stream" "events" {
 
 resource "aws_sqs_queue" "dlq" {
   name                       = "${local.name_prefix}-events-dlq"
-  message_retention_seconds  = 1_209_600  # 14 days
+  message_retention_seconds  = 1209600  # 14 days
   visibility_timeout_seconds = 300
 
   tags = local.common_tags
