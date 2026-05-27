@@ -33,7 +33,7 @@ jobs:
         run: pip install flake8 black isort
 
       - name: flake8
-        run: flake8 producer/ lambda_fn/ redshift/ scripts/ tests/ --max-line-length=100
+        run: flake8 producer/ lambda_fn/ redshift/ scripts/ tests/
 
       - name: black (check only)
         run: black --check --line-length=100 producer/ lambda_fn/ redshift/ scripts/ tests/

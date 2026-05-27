@@ -124,13 +124,13 @@ def replay_to_kinesis(
     total_failed = 0
 
     for i in range(0, len(payloads), BATCH_SIZE):
-        chunk = payloads[i:i + BATCH_SIZE]
+        chunk = payloads[i : i + BATCH_SIZE]
         records = [
             {
                 "Data": json.dumps(p).encode("utf-8") if isinstance(p, dict) else p,
-                "PartitionKey": str(p.get("user_id", f"replay-{i}"))
-                if isinstance(p, dict)
-                else f"replay-{i}",
+                "PartitionKey": (
+                    str(p.get("user_id", f"replay-{i}")) if isinstance(p, dict) else f"replay-{i}"
+                ),
             }
             for p in chunk
         ]
@@ -158,11 +158,8 @@ def replay_to_kinesis(
 def delete_replayed_messages(sqs: Any, dlq_url: str, messages: list[dict]) -> None:
     """Delete successfully replayed messages from DLQ in batches of 10."""
     for i in range(0, len(messages), 10):
-        batch = messages[i:i + 10]
-        entries = [
-            {"Id": str(j), "ReceiptHandle": m["ReceiptHandle"]}
-            for j, m in enumerate(batch)
-        ]
+        batch = messages[i : i + 10]
+        entries = [{"Id": str(j), "ReceiptHandle": m["ReceiptHandle"]} for j, m in enumerate(batch)]
         sqs.delete_message_batch(QueueUrl=dlq_url, Entries=entries)
     log.info("Deleted %d messages from DLQ", len(messages))
 

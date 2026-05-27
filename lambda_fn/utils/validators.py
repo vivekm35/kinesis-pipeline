@@ -13,13 +13,9 @@ from datetime import datetime, timezone
 from typing import Any
 
 # ISO 8601 timestamp pattern (loose — accept with or without timezone)
-_TS_PATTERN = re.compile(
-    r"^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}"
-)
+_TS_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}")
 
-REQUIRED_FIELDS: frozenset[str] = frozenset(
-    {"event_id", "event_type", "timestamp", "user_id"}
-)
+REQUIRED_FIELDS: frozenset[str] = frozenset({"event_id", "event_type", "timestamp", "user_id"})
 
 VALID_EVENT_TYPES: frozenset[str] = frozenset(
     {

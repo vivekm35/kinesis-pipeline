@@ -50,9 +50,7 @@ def get_shard_metrics(
                     {"Name": "StreamName", "Value": stream_name},
                     {"Name": "ShardId", "Value": shard_id},
                 ],
-                StartTime=datetime.fromtimestamp(
-                    now.timestamp() - period * 2, tz=timezone.utc
-                ),
+                StartTime=datetime.fromtimestamp(now.timestamp() - period * 2, tz=timezone.utc),
                 EndTime=now,
                 Period=period,
                 Statistics=["Sum"],

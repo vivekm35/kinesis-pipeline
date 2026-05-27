@@ -49,6 +49,7 @@ def client(service: str):
 def is_localstack_available() -> bool:
     try:
         import urllib.request
+
         urllib.request.urlopen(f"{ENDPOINT}/_localstack/health", timeout=2)
         return True
     except Exception:
@@ -67,6 +68,7 @@ class TestKinesisProducer:
 
     def test_put_records_to_stream(self):
         from producer.producer import build_event, put_records_batch
+
         kinesis = client("kinesis")
 
         events = [build_event() for _ in range(10)]
@@ -77,6 +79,7 @@ class TestKinesisProducer:
 
     def test_events_are_readable_from_shard(self):
         from producer.producer import build_event, put_records_batch
+
         kinesis = client("kinesis")
 
         # Put a uniquely-tagged event
@@ -122,21 +125,24 @@ class TestLambdaHandler:
     def _make_kinesis_event(self, payload: dict, sequence: str) -> dict:
         encoded = base64.b64encode(json.dumps(payload).encode()).decode()
         return {
-            "Records": [{
-                "kinesis": {
-                    "sequenceNumber": sequence,
-                    "data": encoded,
-                    "partitionKey": payload.get("user_id", "test"),
-                    "approximateArrivalTimestamp": time.time(),
-                },
-                "eventSource": "aws:kinesis",
-                "awsRegion": REGION,
-            }]
+            "Records": [
+                {
+                    "kinesis": {
+                        "sequenceNumber": sequence,
+                        "data": encoded,
+                        "partitionKey": payload.get("user_id", "test"),
+                        "approximateArrivalTimestamp": time.time(),
+                    },
+                    "eventSource": "aws:kinesis",
+                    "awsRegion": REGION,
+                }
+            ]
         }
 
     def test_handler_processes_valid_event(self):
         import importlib
         import lambda_fn.handler as h
+
         importlib.reload(h)
 
         payload = {
@@ -156,6 +162,7 @@ class TestLambdaHandler:
     def test_handler_deduplicates_same_sequence(self):
         import importlib
         import lambda_fn.handler as h
+
         importlib.reload(h)
 
         payload = {
@@ -179,6 +186,7 @@ class TestLambdaHandler:
     def test_idempotency_key_written_to_dynamodb(self):
         import importlib
         import lambda_fn.handler as h
+
         importlib.reload(h)
 
         payload = {

@@ -74,14 +74,11 @@ def flush_to_firehose(records: list[dict[str, Any]]) -> None:
     Send a batch of transformed records to Kinesis Firehose.
     Raises on any partial failure so the ESM can retry/DLQ.
     """
-    firehose_records = [
-        {"Data": (json.dumps(rec) + "\n").encode("utf-8")}
-        for rec in records
-    ]
+    firehose_records = [{"Data": (json.dumps(rec) + "\n").encode("utf-8")} for rec in records]
 
     # Firehose allows max 500 records per PutRecordBatch
     for i in range(0, len(firehose_records), FIREHOSE_BATCH_LIMIT):
-        chunk = firehose_records[i:i + FIREHOSE_BATCH_LIMIT]
+        chunk = firehose_records[i : i + FIREHOSE_BATCH_LIMIT]
         try:
             resp = _firehose.put_record_batch(
                 DeliveryStreamName=FIREHOSE_STREAM,

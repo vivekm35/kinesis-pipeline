@@ -173,8 +173,7 @@ def run(stream_name: str, target_rps: int, duration_secs: int, threads: int) -> 
     actual_rps = stats["total_sent"] / elapsed if elapsed > 0 else 0
 
     log.info(
-        "Producer finished — total_sent=%d total_failed=%d "
-        "elapsed=%.1fs actual_rps=%.0f",
+        "Producer finished — total_sent=%d total_failed=%d " "elapsed=%.1fs actual_rps=%.0f",
         stats["total_sent"],
         stats["total_failed"],
         elapsed,

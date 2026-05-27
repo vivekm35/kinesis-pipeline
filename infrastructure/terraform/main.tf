@@ -52,7 +52,7 @@ data "aws_region" "current" {}
 resource "aws_kinesis_stream" "events" {
   name             = "${local.name_prefix}-events"
   shard_count      = var.kinesis_shard_count
-  retention_period = 24  # hours
+  retention_period = 24 # hours
 
   stream_mode_details {
     stream_mode = "PROVISIONED"
@@ -68,7 +68,7 @@ resource "aws_kinesis_stream" "events" {
 
 resource "aws_sqs_queue" "dlq" {
   name                       = "${local.name_prefix}-events-dlq"
-  message_retention_seconds  = 1209600  # 14 days
+  message_retention_seconds  = 1209600 # 14 days
   visibility_timeout_seconds = 300
 
   tags = local.common_tags
@@ -76,8 +76,8 @@ resource "aws_sqs_queue" "dlq" {
 
 resource "aws_sqs_queue_policy" "dlq" {
   queue_url = aws_sqs_queue.dlq.id
-  policy    = jsonencode({
-    Version   = "2012-10-17"
+  policy = jsonencode({
+    Version = "2012-10-17"
     Statement = [{
       Effect    = "Allow"
       Principal = { Service = "lambda.amazonaws.com" }
@@ -156,7 +156,7 @@ resource "aws_iam_role" "lambda" {
   name = "${local.name_prefix}-lambda-role"
 
   assume_role_policy = jsonencode({
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
     Statement = [{
       Effect    = "Allow"
       Principal = { Service = "lambda.amazonaws.com" }
@@ -168,10 +168,10 @@ resource "aws_iam_role" "lambda" {
 }
 
 resource "aws_iam_role_policy" "lambda" {
-  name   = "pipeline-permissions"
-  role   = aws_iam_role.lambda.id
+  name = "pipeline-permissions"
+  role = aws_iam_role.lambda.id
   policy = jsonencode({
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
     Statement = [
       {
         Effect = "Allow"
@@ -242,14 +242,14 @@ resource "aws_lambda_function" "transformer" {
 }
 
 resource "aws_lambda_event_source_mapping" "kinesis" {
-  event_source_arn              = aws_kinesis_stream.events.arn
-  function_name                 = aws_lambda_function.transformer.arn
-  starting_position             = "LATEST"
-  batch_size                    = 500
+  event_source_arn                   = aws_kinesis_stream.events.arn
+  function_name                      = aws_lambda_function.transformer.arn
+  starting_position                  = "LATEST"
+  batch_size                         = 500
   maximum_batching_window_in_seconds = 5
-  parallelization_factor        = 10   # 1 concurrent per shard
-  bisect_batch_on_function_error = true
-  maximum_retry_attempts        = 3
+  parallelization_factor             = 10 # 1 concurrent per shard
+  bisect_batch_on_function_error     = true
+  maximum_retry_attempts             = 3
 
   destination_config {
     on_failure {
@@ -264,7 +264,7 @@ resource "aws_iam_role" "firehose" {
   name = "${local.name_prefix}-firehose-role"
 
   assume_role_policy = jsonencode({
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
     Statement = [{
       Effect    = "Allow"
       Principal = { Service = "firehose.amazonaws.com" }
@@ -276,10 +276,10 @@ resource "aws_iam_role" "firehose" {
 }
 
 resource "aws_iam_role_policy" "firehose" {
-  name   = "s3-write"
-  role   = aws_iam_role.firehose.id
+  name = "s3-write"
+  role = aws_iam_role.firehose.id
   policy = jsonencode({
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
     Statement = [{
       Effect = "Allow"
       Action = [
@@ -304,8 +304,8 @@ resource "aws_kinesis_firehose_delivery_stream" "events" {
   extended_s3_configuration {
     role_arn           = aws_iam_role.firehose.arn
     bucket_arn         = aws_s3_bucket.landing.arn
-    buffering_size     = 128   # MB
-    buffering_interval = 60    # seconds — triggers whichever comes first
+    buffering_size     = 128 # MB
+    buffering_interval = 60  # seconds — triggers whichever comes first
 
     # Structured landing zone: year=YYYY/month=MM/day=DD/hour=HH/
     prefix              = "events/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/"

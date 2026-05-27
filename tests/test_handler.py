@@ -49,9 +49,11 @@ def _valid_payload(event_id: str = "evt-001") -> dict:
 
 # ── Tests ────────────────────────────────────────────────────────────────────
 
+
 class TestDecodeKinesisRecord(unittest.TestCase):
     def test_decodes_valid_record(self):
         from lambda_fn.handler import decode_kinesis_record
+
         payload = _valid_payload()
         record = _make_kinesis_record(payload)
         result = decode_kinesis_record(record)
@@ -59,6 +61,7 @@ class TestDecodeKinesisRecord(unittest.TestCase):
 
     def test_raises_on_invalid_json(self):
         from lambda_fn.handler import decode_kinesis_record
+
         bad_data = base64.b64encode(b"not-json").decode()
         record = {"kinesis": {"data": bad_data, "sequenceNumber": "seq-x"}}
         with pytest.raises(json.JSONDecodeError):
@@ -68,6 +71,7 @@ class TestDecodeKinesisRecord(unittest.TestCase):
 class TestTransform(unittest.TestCase):
     def test_enriches_valid_payload(self):
         from lambda_fn.handler import transform
+
         payload = _valid_payload()
         result = transform(payload, "seq-001")
         assert "_meta" in result
@@ -75,12 +79,14 @@ class TestTransform(unittest.TestCase):
 
     def test_raises_on_missing_fields(self):
         from lambda_fn.handler import transform
+
         payload = {"event_id": "x"}  # missing event_type, timestamp, user_id
         with pytest.raises(ValueError, match="missing required fields"):
             transform(payload, "seq-001")
 
     def test_preserves_original_fields(self):
         from lambda_fn.handler import transform
+
         payload = _valid_payload()
         result = transform(payload, "seq-001")
         assert result["event_type"] == "page_view"
@@ -115,6 +121,7 @@ class TestLambdaHandler(unittest.TestCase):
         """Re-import handler so it picks up the fresh mocked clients."""
         import importlib
         import lambda_fn.handler as h
+
         importlib.reload(h)
         return h
 
@@ -166,6 +173,7 @@ class TestIdempotencyStore(unittest.TestCase):
             BillingMode="PAY_PER_REQUEST",
         )
         from lambda_fn.idempotency import IdempotencyStore
+
         store = IdempotencyStore("test-idempotency", "us-east-1")
         assert store.is_duplicate("new-seq-123") is False
 
@@ -179,6 +187,7 @@ class TestIdempotencyStore(unittest.TestCase):
             BillingMode="PAY_PER_REQUEST",
         )
         from lambda_fn.idempotency import IdempotencyStore
+
         store = IdempotencyStore("test-idempotency", "us-east-1")
         store.mark_processed("seq-abc")
         assert store.is_duplicate("seq-abc") is True

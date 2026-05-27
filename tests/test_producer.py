@@ -16,17 +16,20 @@ os.environ.setdefault("KINESIS_STREAM_NAME", "test-stream")
 class TestBuildEvent(unittest.TestCase):
     def test_has_required_fields(self):
         from producer.producer import build_event
+
         evt = build_event()
         for field in ("event_id", "event_type", "timestamp", "user_id", "session_id"):
             assert field in evt, f"Missing field: {field}"
 
     def test_event_type_override(self):
         from producer.producer import build_event
+
         evt = build_event(event_type="purchase")
         assert evt["event_type"] == "purchase"
 
     def test_event_is_json_serializable(self):
         from producer.producer import build_event
+
         evt = build_event()
         payload = json.dumps(evt)
         assert isinstance(payload, str)
@@ -35,6 +38,7 @@ class TestBuildEvent(unittest.TestCase):
 class TestPutRecordsBatch(unittest.TestCase):
     def test_returns_counts_on_success(self):
         from producer.producer import put_records_batch, build_event
+
         mock_client = MagicMock()
         mock_client.put_records.return_value = {
             "FailedRecordCount": 0,
@@ -47,6 +51,7 @@ class TestPutRecordsBatch(unittest.TestCase):
 
     def test_handles_partial_failure(self):
         from producer.producer import put_records_batch, build_event
+
         mock_client = MagicMock()
         mock_client.put_records.return_value = {
             "FailedRecordCount": 2,
@@ -60,6 +65,7 @@ class TestPutRecordsBatch(unittest.TestCase):
     def test_handles_client_error(self):
         from botocore.exceptions import ClientError
         from producer.producer import put_records_batch, build_event
+
         mock_client = MagicMock()
         mock_client.put_records.side_effect = ClientError(
             {"Error": {"Code": "ProvisionedThroughputExceededException", "Message": "throttle"}},

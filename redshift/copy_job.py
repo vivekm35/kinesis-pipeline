@@ -37,7 +37,7 @@ REDSHIFT_DB = os.environ["REDSHIFT_DB"]
 REDSHIFT_USER = os.environ["REDSHIFT_USER"]
 REDSHIFT_PASSWORD = os.environ["REDSHIFT_PASSWORD"]  # injected by Secrets Manager
 
-IAM_ROLE_ARN = os.environ["REDSHIFT_IAM_ROLE"]   # ARN of role with S3 read access
+IAM_ROLE_ARN = os.environ["REDSHIFT_IAM_ROLE"]  # ARN of role with S3 read access
 AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")
 
 
