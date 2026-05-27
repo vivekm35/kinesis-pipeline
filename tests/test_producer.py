@@ -3,8 +3,8 @@ tests/test_producer.py
 """
 
 import json
-import sys
 import os
+import sys
 import unittest
 from unittest.mock import MagicMock
 
@@ -37,7 +37,7 @@ class TestBuildEvent(unittest.TestCase):
 
 class TestPutRecordsBatch(unittest.TestCase):
     def test_returns_counts_on_success(self):
-        from producer.producer import put_records_batch, build_event
+        from producer.producer import build_event, put_records_batch
 
         mock_client = MagicMock()
         mock_client.put_records.return_value = {
@@ -50,7 +50,7 @@ class TestPutRecordsBatch(unittest.TestCase):
         assert result["failed"] == 0
 
     def test_handles_partial_failure(self):
-        from producer.producer import put_records_batch, build_event
+        from producer.producer import build_event, put_records_batch
 
         mock_client = MagicMock()
         mock_client.put_records.return_value = {
@@ -64,7 +64,8 @@ class TestPutRecordsBatch(unittest.TestCase):
 
     def test_handles_client_error(self):
         from botocore.exceptions import ClientError
-        from producer.producer import put_records_batch, build_event
+
+        from producer.producer import build_event, put_records_batch
 
         mock_client = MagicMock()
         mock_client.put_records.side_effect = ClientError(

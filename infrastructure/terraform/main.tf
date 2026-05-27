@@ -133,6 +133,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "landing" {
     id     = "archive-old-events"
     status = "Enabled"
 
+    filter {
+      prefix = "events/"
+    }
+
     transition {
       days          = 30
       storage_class = "INTELLIGENT_TIERING"
@@ -226,7 +230,7 @@ resource "aws_lambda_function" "transformer" {
 
   # Deploy from local zip; in CI this is replaced by S3 artifact
   filename         = "${path.module}/../../lambda.zip"
-  source_code_hash = filebase64sha256("${path.module}/../../lambda.zip")
+  source_code_hash = fileexists("${path.module}/../../lambda.zip") ? filebase64sha256("${path.module}/../../lambda.zip") : null
 
   environment {
     variables = {

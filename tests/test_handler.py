@@ -120,6 +120,7 @@ class TestLambdaHandler(unittest.TestCase):
     def _fresh_handler(self):
         """Re-import handler so it picks up the fresh mocked clients."""
         import importlib
+
         import lambda_fn.handler as h
 
         importlib.reload(h)

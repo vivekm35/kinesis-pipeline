@@ -23,8 +23,9 @@ import json
 import os
 import time
 import uuid
-import pytest
+
 import boto3
+import pytest
 
 ENDPOINT = os.environ.get("LOCALSTACK_ENDPOINT", "http://localhost:4566")
 REGION = "us-east-1"
@@ -141,6 +142,7 @@ class TestLambdaHandler:
 
     def test_handler_processes_valid_event(self):
         import importlib
+
         import lambda_fn.handler as h
 
         importlib.reload(h)
@@ -161,6 +163,7 @@ class TestLambdaHandler:
 
     def test_handler_deduplicates_same_sequence(self):
         import importlib
+
         import lambda_fn.handler as h
 
         importlib.reload(h)
@@ -185,6 +188,7 @@ class TestLambdaHandler:
 
     def test_idempotency_key_written_to_dynamodb(self):
         import importlib
+
         import lambda_fn.handler as h
 
         importlib.reload(h)
