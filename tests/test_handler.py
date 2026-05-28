@@ -124,6 +124,8 @@ class TestLambdaHandler(unittest.TestCase):
         import lambda_fn.handler as h
 
         importlib.reload(h)
+        h._firehose = None
+        h._idempotency = None
         return h
 
     def test_processes_valid_batch(self):
